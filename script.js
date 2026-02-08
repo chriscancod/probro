@@ -51,24 +51,52 @@ function handleAddLink() {
     }
 }
 
+// Function to handle the "Smart" navigation
+function openInApp(url) {
+    if (!url.startsWith('http')) url = 'https://' + url;
+
+    // List of sites known to block iframes (X-Frame-Options)
+    const blockers = ['google.com', 'github.com', 'discord.com', 'instagram.com', 'facebook.com', 'notion.so'];
+    const isBlocker = blockers.some(domain => url.includes(domain));
+
+    if (isBlocker) {
+        // Option A: Open in a clean, minimal popup window (Distraction-free)
+        const width = 1000;
+        const height = 800;
+        const left = (screen.width / 2) - (width / 2);
+        const top = (screen.height / 2) - (height / 2);
+        
+        window.open(url, 'PROBTO_POPUP', 
+            `width=${width},height=${height},top=${top},left=${left},menubar=no,status=no,toolbar=no,location=no`);
+    } else {
+        // Option B: Open inside the PROBTO internal frame
+        document.getElementById('browser-view').classList.remove('hidden');
+        document.getElementById('web-frame').src = url;
+        document.getElementById('url-indicator').innerText = url.toUpperCase();
+    }
+}
+
+// Updated Render function to include a "Delete" option
 function renderLinks() {
     const container = document.getElementById('links-container');
     container.innerHTML = islandData[currentIsland].map((url, index) => {
-        // Extract a clean name for display
         let displayUrl = url.replace('https://', '').replace('http://', '').split('/')[0];
         return `
-            <div class="link-node" onclick="openInApp('${url}')">
-                <div style="font-size: 18px; color: var(--accent);">↗</div>
-                <span>${displayUrl.toUpperCase()}</span>
+            <div class="link-node">
+                <div class="node-click-area" onclick="openInApp('${url}')">
+                    <div style="font-size: 18px; color: var(--accent);">↗</div>
+                    <span>${displayUrl.toUpperCase()}</span>
+                </div>
+                <button class="node-delete" onclick="removeLink(${index})">×</button>
             </div>
         `;
     }).join('');
 }
 
-function openInApp(url) {
-    document.getElementById('browser-view').classList.remove('hidden');
-    document.getElementById('web-frame').src = url;
-    document.getElementById('url-indicator').innerText = url.toUpperCase();
+function removeLink(index) {
+    islandData[currentIsland].splice(index, 1);
+    localStorage.setItem('probtoData', JSON.stringify(islandData));
+    renderLinks();
 }
 
 function closeBrowser() {
