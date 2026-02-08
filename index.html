@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROBrO // V1.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <span class="status-dot"></span>
+                <span class="status-text">PROBRO OS</span>
+                <button id="toggle-btn" onclick="toggleSidebar()">[ — ]</button>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="timer-card">
+                    <label>FOCUS_CLOCK</label>
+                    <div id="timer-display">25:00</div>
+                    <div class="timer-inputs">
+                        <input type="number" id="timer-input" value="25" min="1">
+                        <button onclick="toggleTimer()" id="start-btn">ENGAGE</button>
+                    </div>
+                </div>
+
+                <nav class="island-list">
+                    <label>TARGET_VOLUMES</label>
+                    <button onclick="selectIsland('School')" id="btn-School">01. SCHOOL</button>
+                    <button onclick="selectIsland('Work')" id="btn-Work">02. WORK</button>
+                    <button onclick="selectIsland('Break')" id="btn-Break">03. BREAK</button>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="viewport">
+            <section id="setup-view" class="center-view">
+                <div class="protocol-header">
+                    <h1 id="island-title">PROBTO // SCHOOL</h1>
+                    <p>LOCK IN. NO DISTRACTIONS.</p>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="link-input" placeholder="// ADD RESOURCE URL">
+                    <button onclick="handleAddLink()">+</button>
+                </div>
+
+                <div id="links-container" class="grid-layout"></div>
+            </section>
+
+            <div id="browser-view" class="hidden">
+                <div class="browser-nav">
+                    <button onclick="closeBrowser()" class="back-btn">← ESCAPE_PROBTO</button>
+                    <span id="url-indicator"></span>
+                </div>
+                <iframe id="web-frame" src=""></iframe>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
