@@ -1,63 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROBrO // V1.0</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; frame-src https: http:;">
+  <title>ProBro</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <aside id="sidebar" class="sidebar">
-            <div class="sidebar-header">
-                <span class="status-dot"></span>
-                <span class="status-text">PROBRO OS</span>
-                <button id="toggle-btn" onclick="toggleSidebar()">[ — ]</button>
+  <div class="app">
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <span class="brand-name">ProBro</span>
+        <button id="collapse-btn" class="icon-btn" title="Collapse sidebar">‹</button>
+      </div>
+
+      <section class="card timer-card">
+        <div id="phase-label" class="eyebrow">Ready</div>
+        <div id="timer-display" class="timer">10:00</div>
+        <div id="current-task" class="current-task">No task chosen</div>
+        <div class="timer-actions">
+          <button id="start-btn" class="btn primary">Start easy</button>
+          <button id="stop-btn" class="btn ghost hidden">End</button>
+        </div>
+        <div id="timer-hint" class="hint">Starts with a gentle 10 minutes. You can keep going after.</div>
+      </section>
+
+      <nav class="islands" aria-label="Islands">
+        <div class="eyebrow">Islands</div>
+        <button class="island-btn" data-island="School"><span class="dot school"></span>School</button>
+        <button class="island-btn" data-island="Work"><span class="dot work"></span>Work</button>
+        <button class="island-btn" data-island="Break"><span class="dot rest"></span>Break</button>
+      </nav>
+
+      <section class="card">
+        <div class="eyebrow">Tasks · <span id="tasks-island"></span></div>
+        <form id="task-form" class="row">
+          <input id="task-input" type="text" placeholder="One small next step…" autocomplete="off">
+          <button class="btn small" type="submit">Add</button>
+        </form>
+        <ul id="task-list" class="task-list"></ul>
+      </section>
+
+      <section class="card">
+        <div class="eyebrow">Brain dump</div>
+        <form id="dump-form" class="column">
+          <textarea id="dump-input" rows="2" placeholder="Stray thought? Park it here. (⌘/Ctrl+J)"></textarea>
+          <button class="btn small" type="submit">Park it</button>
+        </form>
+        <ul id="dump-list" class="dump-list"></ul>
+      </section>
+
+      <section class="card">
+        <div class="eyebrow">Today</div>
+        <div class="stats">
+          <div><span id="stat-focus">0</span><small>focus min</small></div>
+          <div><span id="stat-blocked">0</span><small>pauses</small></div>
+          <div><span id="stat-overrides">0</span><small>overrides</small></div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <div class="tabbar">
+        <div id="tabs" class="tabs"></div>
+        <button id="new-tab-btn" class="icon-btn" title="New tab (⌘/Ctrl+T)">+</button>
+      </div>
+      <form id="address-form" class="addressbar">
+        <button type="button" id="back-btn" class="icon-btn" title="Back">←</button>
+        <button type="button" id="fwd-btn" class="icon-btn" title="Forward">→</button>
+        <button type="button" id="reload-btn" class="icon-btn" title="Reload">↻</button>
+        <input id="address-input" type="text" placeholder="Search or enter address" autocomplete="off" spellcheck="false">
+      </form>
+
+      <div class="stage">
+        <section id="home" class="home">
+          <h1 id="home-title">School</h1>
+          <p id="home-sub" class="sub"></p>
+
+          <div class="mode-row">
+            <label for="strict-select">When I wander off during focus:</label>
+            <select id="strict-select">
+              <option value="soft">Pause me gently (10s, then I can choose)</option>
+              <option value="hard">Hard block until the timer ends</option>
+              <option value="off">Don't interrupt</option>
+            </select>
+          </div>
+
+          <div class="eyebrow">Allowed sites</div>
+          <div id="sites" class="sites"></div>
+          <form id="site-form" class="row site-form">
+            <input id="site-input" type="text" placeholder="Add a site, e.g. docs.google.com" autocomplete="off">
+            <button class="btn small" type="submit">Add</button>
+          </form>
+        </section>
+
+        <div id="webviews" class="webviews"></div>
+
+        <div id="gate" class="gate hidden" role="dialog" aria-modal="true">
+          <div class="gate-card">
+            <h2 id="gate-title">Pause.</h2>
+            <p id="gate-body"></p>
+            <div id="gate-count" class="gate-count"></div>
+            <div class="gate-actions">
+              <button id="gate-back" class="btn primary">Back to focus</button>
+              <button id="gate-go" class="btn ghost" disabled>Continue anyway</button>
             </div>
-            
-            <div class="sidebar-content">
-                <div class="timer-card">
-                    <label>FOCUS_CLOCK</label>
-                    <div id="timer-display">25:00</div>
-                    <div class="timer-inputs">
-                        <input type="number" id="timer-input" value="25" min="1">
-                        <button onclick="toggleTimer()" id="start-btn">ENGAGE</button>
-                    </div>
-                </div>
+          </div>
+        </div>
 
-                <nav class="island-list">
-                    <label>TARGET_VOLUMES</label>
-                    <button onclick="selectIsland('School')" id="btn-School">01. SCHOOL</button>
-                    <button onclick="selectIsland('Work')" id="btn-Work">02. WORK</button>
-                    <button onclick="selectIsland('Break')" id="btn-Break">03. BREAK</button>
-                </nav>
+        <div id="checkin" class="gate hidden" role="dialog" aria-modal="true">
+          <div class="gate-card">
+            <h2>Nice start 🌱</h2>
+            <p>The hardest part is done. Keep going or take a break?</p>
+            <div class="gate-actions wrap">
+              <button id="ext-btn" class="btn primary">Keep going +15</button>
+              <button id="brk-btn" class="btn ghost">Break now</button>
             </div>
-        </aside>
-
-        <main class="viewport">
-            <section id="setup-view" class="center-view">
-                <div class="protocol-header">
-                    <h1 id="island-title">PROBTO // SCHOOL</h1>
-                    <p>LOCK IN. NO DISTRACTIONS.</p>
-                </div>
-
-                <div class="input-group">
-                    <input type="text" id="link-input" placeholder="// ADD RESOURCE URL">
-                    <button onclick="handleAddLink()">+</button>
-                </div>
-
-                <div id="links-container" class="grid-layout"></div>
-            </section>
-
-            <div id="browser-view" class="hidden">
-                <div class="browser-nav">
-                    <button onclick="closeBrowser()" class="back-btn">← ESCAPE_PROBTO</button>
-                    <span id="url-indicator"></span>
-                </div>
-                <iframe id="web-frame" src=""></iframe>
-            </div>
-        </main>
-    </div>
-    <script src="script.js"></script>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="store.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
