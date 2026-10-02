@@ -1,0 +1,9 @@
+{
+  "name": "probro",
+  "version": "2.0.0",
+  "description": "A calm, focus-first browser: islands, enforced focus sessions, tasks.",
+  "main": "main.js",
+  "scripts": { "start": "electron ." },
+  "devDependencies": { "electron": "^33.0.0" },
+  "license": "MIT"
+}

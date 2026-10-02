@@ -1,21 +1,43 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+
+let win;
 
 function createWindow() {
-  const win = new BrowserWindow({
-    width: 1100,
-    height: 750,
-    titleBarStyle: 'hiddenInset', // Gives it that clean Mac "integrated" look
+  win = new BrowserWindow({
+    width: 1200,
+    height: 780,
+    minWidth: 820,
+    minHeight: 520,
+    titleBarStyle: 'hiddenInset',
+    backgroundColor: '#f4f1ea',
     webPreferences: {
-      nodeIntegration: true
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      webviewTag: true
     }
   });
-
   win.loadFile('index.html');
 }
 
-app.whenReady().then(createWindow);
+// Pages that try to open a new window become a new ProBro tab instead.
+app.on('web-contents-created', (_e, contents) => {
+  if (contents.getType() === 'webview') {
+    contents.setWindowOpenHandler(({ url }) => {
+      if (win && !win.isDestroyed()) win.webContents.send('open-url', url);
+      return { action: 'deny' };
+    });
+  }
+});
 
-// Standard Mac behavior: stay open even if window is closed
+app.whenReady().then(() => {
+  createWindow();
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
